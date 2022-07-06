@@ -1,0 +1,9 @@
+{% if site.others %}
+<hr>
+<h5>OTHERS</h5>
+<ul class="list-inline">
+  {% for other in site.others %}
+  <li><a href="{{other.href}}">{{other.title}}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}

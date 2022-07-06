@@ -21,7 +21,7 @@ pre.highlight {
   background-color: #1e0010;
 }
 .language-coq .highlight .err {
-  // Hux: a temp workaround to fix for Coq math symbol
+  // a temp workaround to fix for Coq math symbol
   // @see https://github.com/rouge-ruby/rouge/issues/1312
   &:extend(.highlight .k);
   background-color: transparent;
@@ -208,12 +208,12 @@ pre.highlight {
   color: #a6e22e;
 }
 
-// Customize for Hux Blog
+// Customize for Blog
 .highlighter-rouge .highlight {
   margin-bottom: 10px;
   border-radius: 6px;
   pre {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
     color: #555;
     background: transparent;
@@ -223,7 +223,8 @@ pre.highlight {
     word-wrap: normal; // Safari Bug
   }
   .rouge-table {
-    .rouge-gutter, .rouge-code {
+    .rouge-gutter,
+    .rouge-code {
       border: 0 !important;
     }
   }
@@ -246,12 +247,12 @@ pre.highlight {
       border: 0;
       padding: 0;
       > pre {
-        padding: 14px;
+        padding: 13px;
       }
     }
   }
   td.rouge-gutter {
-    width: 56px;
+    width: 42px;
   }
   .lineno {
     text-align: right;
@@ -260,15 +261,15 @@ pre.highlight {
   }
 }
 /* Landscape phones and down */
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
   .highlighter-rouge .highlight {
     margin-left: -15px;
     margin-right: -15px;
     border-radius: 0px;
     td.rouge-gutter {
-      width: 36px;
+      width: 32px;
     }
-    table>tbody>tr>td>pre {
+    table > tbody > tr > td > pre {
       padding: 14px 10px;
     }
   }

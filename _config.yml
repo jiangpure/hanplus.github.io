@@ -1,22 +1,23 @@
 # Site settings
-title: HanPlus
-SEOTitle: 分享好玩的事情 | HanPlus
+title: Pure Jiang
+SEOTitle: 分享有趣的事情 | Pure Jiang
 header-img: img/home-bg.jpg
-email: jiangpengbelief@gmail.com
-description: "没什么好说的"
+email: purejiang@gmail.com
+description: "有什么好玩的知识和事情都可以分享"
 keyword: "Java, kotlin, Android, Flutter, Python, 爬虫, 博客文章, 有趣的, 互联网"
-url: "https://hanplus.cn"              # your host, for absolute URL
-baseurl: "/blog"                             # for example, '/blog' if your blog hosted on 'host/blog'
+url: "https://purejiang.gitee.io/"              # your host, for absolute URL
+baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
 # Publish posts or collection documents with a future date.
 future: true
 
 # SNS settings
 RSS: false
-weibo_username:     HanPlus
-zhihu_username:     HanPlus
-github_username:    HanPlus
-twitter_username:   HanPlus
+weibo_username:     
+zhihu_username:     
+github_username: purejiang
+juejin_username: 690907272722600
+jianshu_username: c578c1b3efcf 
 #facebook_username:  HanPlus
 #linkedin_username:  firstname-lastname-idxxxx
 
@@ -59,7 +60,7 @@ kramdown:
 
 
 # Disqus settings
-disqus_username: HanPlus
+disqus_username: purejiang
 
 # Netease settings
 netease_comment: false
@@ -68,18 +69,18 @@ netease_comment: false
 
 # Analytics settings
 # Baidu Analytics 
-# ba_track_id: [your track id]
+ba_track_id: 931df5fba0c118bd36deba2128f0f4b8
 
 # Google Analytics
-ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
-ga_domain: huangxuan.me
+# ga_track_id: 'G-DXSF8F345G'            # id
+# ga_domain: auto
 
 
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "做好每一天<br>至少从现在开始"
-sidebar-avatar: /img/hanplus_head.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-about-description: "不怕万千人阻挡<br>只怕自己投降~"
+sidebar-avatar: https://purejiang.gitee.io/img/hanplus_head.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
@@ -100,16 +101,26 @@ page-mathjax: false
 
 
 
-# Friends
-friends: [
+# Others
+others: [
     {
-    #     title: "Su",
-    #     href: "http://su.gallery/"
-    # },{
-        title: "我的简书",
-        href: "https://www.jianshu.com/u/c578c1b3efcf"
-    },{
-        title: "wanAndroid",
+        title: "WanAndroid",
         href: "https://www.wanandroid.com/"
+    }, 
+    {
+        title: "菜鸟工具",
+        href: "https://c.runoob.com/"
+    },
+    {
+        title: "实验楼",
+        href: "https://www.lanqiao.cn/"
+    },
+    {
+        title: "力扣",
+        href: "https://leetcode-cn.com/problemset/all/"
+    },
+    {
+        title: "ApiFox",
+        href: "https://www.apifox.cn/"
     }
 ]

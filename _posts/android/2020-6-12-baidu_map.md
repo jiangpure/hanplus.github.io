@@ -1,82 +1,82 @@
 ---
 layout:     post
-title:      "『Android』 百度地图SDK的简单接入"
+title:      "『Android』 百度地图 SDK 的简单接入"
 subtitle:   "简单快速地在你的项目中接入百度地图。"
 date:       2018-04-29 12:00:00
-author:     "HanPlus"
-header-img: "img/post-bg-2015.jpg"
+author:     "purejiang"
+header-img: "img/post-bg-1.jpg"
 catalog: true
 tags:
     - Android
 ---
 
-## 一、 申请API_KEY
+## 一、 申请 API_KEY
 
 #### 1. http://lbsyun.baidu.com/ :在这里注册并申请。注册之后出现应用列表，选择 *创建应用* ：
 
-![创建应用](https://upload-images.jianshu.io/upload_images/10515352-d409ab7d7f158e51.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![创建应用](/img/android/baidu_map/0.jpg)
 
-#### 2. 创建应用后如下图所示：
+##### 2. 创建应用后如下图所示：
 
-![选择](https://upload-images.jianshu.io/upload_images/10515352-590ab8d38ce419fa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![选择](/img/android/baidu_map/1.jpg)
 
 - 应用类型选择的话，我们选择 *Android SDK* 就可以了。
 
-![SHA1](https://upload-images.jianshu.io/upload_images/10515352-cb675e1ea363cb06.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![SHA1](/img/android/baidu_map/2.jpg)
 
-PS：`SHA1`找了我好久...
+PS：`SHA1` 找了我好久...
 
 
 - SHA1寻找之路：
 左侧选择项目目录类型 *project* ，打开右侧 *Gradle* > *app*  > *android* > *signingReport* ，点击发现空白，突然发现左下角有个转换的键（左下标红的地方），答案出来了。
 
-![](https://upload-images.jianshu.io/upload_images/10515352-416c06ef45af6a41.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](/img/android/baidu_map/3.jpg)
 
-![](https://upload-images.jianshu.io/upload_images/10515352-4c88364aceccd968.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](/img/android/baidu_map/4.jpg)
 
-![](https://upload-images.jianshu.io/upload_images/10515352-8674855f8e37c632.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-
-#### 3. 获取基本参数 
-
-- 创建完成，获得`API_KEY`。 
-
-![](https://upload-images.jianshu.io/upload_images/10515352-d8935a063aacb75d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](/img/android/baidu_map/5.jpg)
 
 
-## 二、 下载百度定位SDK
+##### 3. 获取基本参数 
+
+- 创建完成，获得 `API_KEY`。 
+
+![](/img/android/baidu_map/6.jpg)
+
+
+## 二、 下载百度定位 SDK
 
 - 如无特殊要求，选择基础功能即可：
 
-![](https://upload-images.jianshu.io/upload_images/10515352-9d2912460b7cd39e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](/img/android/baidu_map/7.jpg)
 
 
 - 下载开发包解压后得到 *libs* 文件夹。
 
-![](https://upload-images.jianshu.io/upload_images/10515352-0563d8d80bcc33a8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](/img/android/baidu_map/8.jpg)
 
 
-- *BaiduLBS_android.jar* 放在 *project* 目录下的 *app* > *libs* 目录下，其他so库放在 *app* > *main* > 新建文件夹*jniLibs* 下，或者都可以放*jniLibs*下。
+- *BaiduLBS_android.jar* 放在 *project* 目录下的 *app* > *libs* 目录下，其他 so 库放在 *app* > *main* > 新建文件夹 *jniLibs* 下，或者都可以放 *jniLibs* 下。
 
 
 ## 三、 使用百度地图
 
-#### 1. 在 *AndroidManifest.xml* 中添加如下权限：
+##### 1. 在 *AndroidManifest.xml* 中添加如下权限：
 
 ```
 <!-- 这个权限用于进行网络定位-->
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-<!-- 这个权限用于访问GPS定位-->
+<!-- 这个权限用于访问 GPS 定位-->
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-<!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位-->
+<!-- 用于访问 wifi 网络信息，wifi 信息会用于进行网络定位-->
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
 <!-- 获取运营商信息，用于支持提供运营商信息相关的接口-->
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-<!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位-->
+<!-- 这个权限用于获取 wifi 的获取权限，wifi 信息会用来进行网络定位-->
 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 
 <!-- 用于读取手机当前的状态-->
@@ -92,23 +92,23 @@ PS：`SHA1`找了我好久...
 <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
 ```
 
-- 在`Application`标签中声明`SERVICE`组件,每个APP拥有自己单独的定位`SERVICE`：
+- 在 `application` 中声明 `service` ,每个APP拥有自己单独的定位`service`：
 
 ```
 <service android:name="com.baidu.location.f" 
 		 android:enabled="true" 
 		 android:process=":remote"/>
 ```
-
-- 百度定位SDK在4.2版本之后需要在 *AndroidMainfest.xml* 中正确设置`Accesskey（AK）`，如果设置错误将会导致定位和地理围栏服务无法正常使用。设置`AK`，在`Application`标签中加入：
+ 
+- 百度定位 SDK 在4.2版本之后需要在 *AndroidMainfest.xml* 中正确设置 `Accesskey（AK）`，如果设置错误将会导致定位和地理围栏服务无法正常使用。设置 `AK`，在 `application` 中加入：
 
 ```
 <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="AK" />       //AK:开发者申请的Key
+            android:value="AK" />       //AK:开发者申请的 Key
 ```
 
-#### 2. 新建`LBSwithBaidu`，`LBSwithBaidu`代码如下：
+##### 2. 新建 `LBSwithBaidu`，`LBSwithBaidu` 代码如下：
 
 ```Java
 public class LBSwithBaidu extends AppCompatActivity {
@@ -271,8 +271,8 @@ public class LBSwithBaidu extends AppCompatActivity {
 }
 ```
 
-#### 3. 最终效果图：
+##### 3. 最终效果图：
 
-![](https://upload-images.jianshu.io/upload_images/10515352-341f7d5825174547.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](/img/android/baidu_map/9.jpg)
 
 如有不对之处，欢迎指正，谢谢~
