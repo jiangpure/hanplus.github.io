@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "『Python』 Anaconda 的安装以及 PyCharm 中的配置"
-subtitle:   "学Python的第一步，Anaconda。"
+subtitle:   "Python 的包管理+环境管理系统：Anaconda。"
 date:       2018-04-29 12:00:00
 author:     "purejiang"
 header-img: "img/post-bg-1.jpg"

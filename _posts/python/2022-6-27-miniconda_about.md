@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "『Python』 Miniconda 的安装与使用"
-subtitle:   "学Python的第一步，Anaconda。"
+subtitle:   "Anaconda 的精简版：Miniconda。"
 date:       2022-06-27 11:00:00
 author:     "purejiang"
 header-img: "img/post-bg-1.jpg"
