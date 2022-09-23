@@ -32,39 +32,39 @@ tags:
 #### 2.1 导入远程依赖
 在 **Module** 的 `build.gradle` 下导入远程依赖。
 ```groovy
-    dependencies {
-        // billing的版本
-        def billing_version = "5.0.0"
-        implementation "com.android.billingclient:billing:$billing_version"
-    }
+dependencies {
+    // billing的版本
+    def billing_version = "5.0.0"
+    implementation "com.android.billingclient:billing:$billing_version"
+}
 ```
 #### 2.2 初始化结算库
 - 设置支付结果回调 `purchaseUpdateListener`，进行交易成功或者失败后的处理（详见 2.5 小节），`enablePendingPurchases()` 是支持待处理的交易（必须加上）。
 
 ```java
-    mBillingClient = BillingClient.newBuilder(context)
-            .setListener(purchaseUpdateListener)
-            .enablePendingPurchases()
-            .build();          
+mBillingClient = BillingClient.newBuilder(context)
+        .setListener(purchaseUpdateListener)
+        .enablePendingPurchases()
+        .build();          
 ```
 
-- 然后通过 `BillingClient.startConnection()` 连接谷歌商店，在 `onBillingServiceDisconnected()` 里可以尝试重新连接或者做好失败的处理，连接成功后才可进行后面的操作。
+- 然后通过 `BillingClient.startConnection()` 连接谷歌商店，在 `onBillingServiceDisconnected()` 里可以尝试重新连接或者做好失败的处理，连接成功后才可进行后面的操作，或者在调起支付时通过设定的连接状态参数去做重连处理。
 
 ```java
-    mBillingClient.startConnection(new BillingClientStateListener() {
-        @Override
-        public void onBillingSetupFinished(BillingResult billingResult) {
-            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                // 连接成功
-            }
+mBillingClient.startConnection(new BillingClientStateListener() {
+    @Override
+    public void onBillingSetupFinished(BillingResult billingResult) {
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+            // 连接成功
         }
+    }
 
-        @Override
-        public void onBillingServiceDisconnected() {
-            // 强烈建议实现自己的连接重试逻辑并替换 onBillingServiceDisconnected() 方法。请确保在执行任何方法时都与 BillingClient 保持连接。
-            // 连接失败
-        }
-    });
+    @Override
+    public void onBillingServiceDisconnected() {
+        // 强烈建议实现自己的连接重试逻辑并替换 onBillingServiceDisconnected() 方法。请确保在执行任何方法时都与 BillingClient 保持连接。
+        // 连接失败，最好重新调用谷歌的连接服务
+    }
+});
 ```
 #### 2.3 查询商品信息
 通过 `sku` 查询商品信息，`sku` 是在 **Google Play后台** 配置的**商品标识**。
@@ -76,53 +76,53 @@ tags:
 `SkuDetails` 是商品信息，一般情况我们原封不动拿到然后去下单即可。
 
 ```java
-    // 结算库 4.0
-    /*
-    List<String> skuList = new ArrayList<>();
-    skuList.add(sku);
-    SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-    params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
-    */
-    //结算库5.0
-    List<QueryProductDetailsParams.Product> productList = new ArrayList<>();
-    QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(sku)
-                    .setProductType(BillingClient.ProductType.INAPP)
-                    .build();
-    productList.add(product);
-    QueryProductDetailsParams queryProductDetailsParams = QueryProductDetailsParams.newBuilder()
-                            .setProductList(productList)
-                            .build();
-    // 4.0 查询商品列表
-    /*
-    mBillingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
-                @Override
-                public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+// 结算库 4.0
+/*
+List<String> skuList = new ArrayList<>();
+skuList.add(sku);
+SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+*/
+//结算库5.0
+List<QueryProductDetailsParams.Product> productList = new ArrayList<>();
+QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(sku)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build();
+productList.add(product);
+QueryProductDetailsParams queryProductDetailsParams = QueryProductDetailsParams.newBuilder()
+                        .setProductList(productList)
+                        .build();
+// 4.0 查询商品列表
+/*
+mBillingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
+            @Override
+            public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
 
-                }
-    });
-    */
-    // 5.0 查询商品列表
-    mBillingClient.queryProductDetailsAsync(queryProductDetailsParamsnew ProductDetailsResponseListener() {
-                @Override
-                public void onProductDetailsResponse(BillingResulbillingResult, List<ProductDetails> productDetailsList) {
-                    // check billingResult
-                    int code = billingResult.getResponseCode();
-                    // 查询商品失败
-                    if (code != BillingClient.BillingResponseCode.OK || productDetailsList == null || productDetailsList.isEmpty()) {
-                        String msg = billingResult.getDebugMessage();
-                        if (mCallBack != null) {
-                            mCallBack.payFailure(QUERY_SKU_FAIL, msg);
-                        }
-                        return;
-                    }
-                    // 查询商品成功
-                    for (ProductDetails productDetails : productDetailsList) {
-                        // 拉起支付页面
-                    }
             }
+});
+*/
+// 5.0 查询商品列表
+mBillingClient.queryProductDetailsAsync(queryProductDetailsParamsnew ProductDetailsResponseListener() {
+            @Override
+            public void onProductDetailsResponse(BillingResulbillingResult, List<ProductDetails> productDetailsList) {
+                // check billingResult
+                int code = billingResult.getResponseCode();
+                // 查询商品失败
+                if (code != BillingClient.BillingResponseCode.OK || productDetailsList == null || productDetailsList.isEmpty()) {
+                    String msg = billingResult.getDebugMessage();
+                    if (mCallBack != null) {
+                        mCallBack.payFailure(QUERY_SKU_FAIL, msg);
+                    }
+                    return;
+                }
+                // 查询商品成功
+                for (ProductDetails productDetails : productDetailsList) {
+                    // 拉起支付页面
+                }
         }
-    );
+    }
+);
 ```
 #### 2.4 拉起支付页面
 通过 `launchBillingFlow()` 方法可以发起交易请求进行下单。\
@@ -135,33 +135,33 @@ tags:
 建议 `setObfuscatedAccountId()` 传入应用的用户 `id`，`setObfuscatedProfileId` 传入应用本次下单的 `orderId`（不是谷歌的 `orderId`，是应用自己的 `orderId`），这样就可以关联到对应的应用 `orderId` 进行补单。
 
 ```java
-    List<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
-    BillingFlowParams.ProductDetailsParams product = BillingFlowParams.ProductDetailsParams.newBuilder()
-        .setProductDetails(productDetails)
-        // 优惠购买
-        //.setOfferToken(selectedOfferToken)
-        .build();
-    productDetailsParamsList.add(product);
+List<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
+BillingFlowParams.ProductDetailsParams product = BillingFlowParams.ProductDetailsParams.newBuilder()
+    .setProductDetails(productDetails)
+    // 优惠购买
+    //.setOfferToken(selectedOfferToken)
+    .build();
+productDetailsParamsList.add(product);
 
-    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                    .setProductDetailsParamsList(productDetailsParamsList)
-                    .setObfuscatedAccountId(orderId)
-                    .setObfuscatedProfileId(orderId)
+BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .setObfuscatedAccountId(orderId)
+                .setObfuscatedProfileId(orderId)
                     .build();
 
-            // 拉起支付页面
-    BillingResult billingResult = mBillingClient.launchBillingFlow(activity, billingFlowParams);
+        // 拉起支付页面
+BillingResult billingResult = mBillingClient.launchBillingFlow(activity, billingFlowParams);
 
-    int responseCode = billingResult.getResponseCode();
-    if (responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                // 商品已存在
-        return;
-    }
-    if (responseCode != BillingClient.BillingResponseCode.OK) {
-        String msg = billingResult.getDebugMessage();
-        // 拉起支付页面失败
-        return;
-    }
+int responseCode = billingResult.getResponseCode();
+if (responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+            // 商品已存在
+    return;
+}
+if (responseCode != BillingClient.BillingResponseCode.OK) {
+    String msg = billingResult.getDebugMessage();
+    // 拉起支付页面失败
+    return;
+}
 ```
 #### 2.5 支付结果
 自定义成功和失败的接口，用来供外部调用，当然有其他的回调也可以加进来，像支付的步骤回调（用于支付日志打点上报）等。
@@ -203,28 +203,28 @@ public interface GooglePayCallback {
 `billingResult.getDebugMessage()` 方法可以获取结算 API 返回的相关消息，这个方法返回的字符串可能为空。
 
 ```java
-    purchaseUpdateListener = new PurchasesUpdatedListener() {
-                @Override
-                public void onPurchasesUpdated(@NonNull BillingResult billingResult, List<Purchase> purchases) {
-                    // 根据返回的状态码做相应回调
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
+purchaseUpdateListener = new PurchasesUpdatedListener() {
+            @Override
+            public void onPurchasesUpdated(@NonNull BillingResult billingResult, List<Purchase> purchases) {
+                // 根据返回的状态码做相应回调
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
 
-                        // 支付成功
-                        for (Purchase purchase : purchases) {
-                            // 通知发货
-                            mCallBack.paySuccess(purchase, purchase.getSkus().get(0), purchase.getPurchaseToken(), orderId, false);
-                        } 
-                    } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+                    // 支付成功
+                    for (Purchase purchase : purchases) {
+                        // 通知发货
+                        mCallBack.paySuccess(purchase, purchase.getSkus().get(0), purchase.getPurchaseToken(), orderId, false);
+                    } 
+                } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
 
-                        // 支付取消
-                        mCallBack.payFailure(PAY_CANCEL, billingResult.getDebugMessage());
-                    } else {
-
-                        // 支付失败
-                        mCallBack.payFailure(PAY_FAIL, billingResult.getDebugMessage());
-                    }
+                    // 支付取消
+                    mCallBack.payFailure(PAY_CANCEL, billingResult.getDebugMessage());
+                } else {
+                
+                    // 支付失败
+                    mCallBack.payFailure(PAY_FAIL, billingResult.getDebugMessage());
                 }
             }
+        }
 ```
 #### 2.5 消耗订单（通知谷歌发货成功）
 用户支付成功后会在 `PurchasesUpdatedListener` 的 `onPurchasesUpdated()` 中回调结果，所以在`BillingClient.BillingResponseCode.OK` 时进行**发货**。
@@ -271,15 +271,15 @@ D: ~~在应用外进行的购买~~（本文是针对应用内支付，所以考�
     /**
     * 查询订单，google最近一次的交易（成功失败都会返回）
     */
-    mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(), new PurchasesResponseListener() {
-        @Override
-        public void onQueryPurchasesResponse(BillingResult billingResult, List<Purchase> purchases) {
-            // Process the result
-            for (Purchase purchase : purchases) {
-                handleConsumePurchase(purchase);
-            }
+mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(), new PurchasesResponseListener() {
+    @Override
+    public void onQueryPurchasesResponse(BillingResult billingResult, List<Purchase> purchases) {
+        // Process the result
+        for (Purchase purchase : purchases) {
+            handleConsumePurchase(purchase);
         }
-    });
+    }
+});
 ```
 ### 三、支付验证
 支付完成之后，需要在服务端进行谷歌支付订单的验证。
