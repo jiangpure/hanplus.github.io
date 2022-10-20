@@ -10,7 +10,7 @@ tags:
     - Android
 ---
 
->上文说到了 **Google 登录服务**的接入工作，接下来进行 `Adjust` 和 `Firebase` 的接入工作。
+>上文说到了 **Google 结算服务**的接入工作，接下来进行 `Adjust` 和 `Firebase` 的接入工作。
 
 应用一般会自带数据上报或者接入第三方数据上报 SDK ，以得到有关应用和用户的行为数据，然后会根据数据针对应用的投放和功能等进行相应调整，所以这个还是挺重要的。
 
@@ -21,34 +21,34 @@ tags:
 ---
 ### 一、Firebase 的接入
 
-#### 新建项目
+#### 1. 新建项目
 
-1. 首先登录 [Firebase 控制台](https://console.firebase.google.com/u/0/)，开始新建项目。
+首先登录 [Firebase 控制台](https://console.firebase.google.com/u/0/)，开始新建项目。\
 ![创建项目](/img/android/googleplay_shalf_2_3/1.png)
 
-2. 输入项目名称，这里没有特殊限制。
+输入项目名称，这里没有特殊限制。\
 ![输入项目名](/img/android/googleplay_shalf_2_3/2.png)
 
-3. 默认选择开启 Google Analytics。
+可以自行选择是否开启 Google Analytics（建议开启，后期看数据方便）。\
 ![选择开启](/img/android/googleplay_shalf_2_3/3.png)
 
-4. 新建或者选择已有的分析账号。
+新建或者选择已有的分析账号（可以每个分析账号对应一个应用或者几个同类型应用，看具体需要）。\
 ![选择账号](/img/android/googleplay_shalf_2_3/4.png)
 
-到这里新建项目已经是完成了，接下来就是关联应用。
+到这里新建项目已经是完成，接下来就是关联应用。
 
 #### 关联应用
 
-1. 转到项目设置，并在底部添加应用，`Android`/`Web`/`Ios`，这里我们是新建 Android 应用。
+首先打开 Firebase 控制台，转到项目设置，并在底部添加应用，`Android`/`Web`/`Ios`，这里我们是新建 Android 应用。\
 ![项目设置](/img/android/googleplay_shalf_2_3/5.png)
 
-2. 添加应用配置，如果有接入 Google 登录的话，包名和 `SHA1` 必须和 Google 登录的配置保持一致。
+其次添加应用配置，如果有接入 Google 登录的话，包名和 `SHA1` 必须和 Google 登录的配置保持一致。\
 ![添加应用](/img/android/googleplay_shalf_2_3/6.png)
 
-3. 下载配置文件 `google-services.json`，这个文件，在后面的 Firebase SDK 接入中是必需的。
+然后下载配置文件 `google-services.json`，这个文件，在后面的 Firebase SDK 接入中是必需的。\
 ![下载配置文件](/img/android/googleplay_shalf_2_3/7.png)
 
-4. 后面都选下一步即可，创建完成之后就可以在项目设置里面看到应用了。
+最后都选下一步即可，创建完成之后就可以在项目设置里面看到应用了。\
 ![项目设置里面的应用](/img/android/googleplay_shalf_2_3/8.png)
 
 #### 接入 SDK 和事件上报

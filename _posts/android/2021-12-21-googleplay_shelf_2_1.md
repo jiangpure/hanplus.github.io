@@ -49,21 +49,21 @@ GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DE
         .requestIdToken(getString(R.string.server_client_id))
         .requestEmail()
         .build();
-// 传入Activity
+// 传入 Activity
 mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 ```
 
 - 获取当前登录账号，不为 `null` 时，可以**直接进行登录**或者**调用登出再调登录**。
 
 ```java
-// 获取的account不为null则表示当前已有登录的账号，为null则无任何登录账号
+// 获取的 account 不为 null 则表示当前已有登录的账号，为 null 则无任何登录账号
 GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 ```
 
 - 通过 `GoogleSignInClient.getSignInIntent()` 获取登录的 `Intent` 对象，通过 `startActivityForResult()` 拉起谷歌登录界面。
 
 ```java
-// RC_SIGN_IN为自定义的请求码
+// RC_SIGN_IN 为自定义的请求码
 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
 startActivityForResult(signInIntent, RC_SIGN_IN);
 ```
@@ -120,5 +120,5 @@ mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>
 - 当登陆失败时，请检查是否能连接 **Google Play 商店**。
 - 一般来说，在 Google API 后台创建凭证时，会创建**包名**和上传签名的 `SHA1`，所以当谷歌登录失败，错误码 `= 10` 时，请检查**包名**和 `SHA1` 值。
 
-以上就是 Google 登录服务的内容，更详细的接入内容请参考官方文档[使用谷歌登录](https://developers.google.cn/identity/sign-in/android/start-integrating)。
+以上就是 Google 登录服务的接入过程，更详细的接入内容请参考官方文档[《使用谷歌登录》](https://developers.google.cn/identity/sign-in/android/start-integrating)。
 
