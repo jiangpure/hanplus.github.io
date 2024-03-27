@@ -297,7 +297,7 @@ mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductT
 #### 3.2 获取验证的 Token
 - 然后由服务端同事获取用于支付验证的 refresh_token。
 
-### 3.3 进行支付验证
+#### 3.3 进行支付验证
 可以通过 [API products](https://developers.google.cn/android-publisher/api-ref/rest/v3/purchases.products) 拿到订单信息，根据购买状态和消耗状态和透传参数中的应用 `orderId` 判断是否发货。
 
 - `purchaseState` （购买状态）：0. 已购买，1. 已取消，2. 待处理
@@ -305,25 +305,37 @@ mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductT
 - `obfuscatedExternalProfileId` （可传字符串）：应用的 orderId 或者订单的唯一标识
 
 ### 四、避坑指南
-- 谷歌结算服务的测试步骤：
-  1. 上传 `aab` 包体到 Google Play
-  2. 将本地账号加入应用的测试账号列表
-  3. 从测试链接中下载商店包进行支付的测试\
+#### 4.1 谷歌结算服务的测试步骤
+  - 上传 `aab` 包体到 Google Play
+  - 将本地账号加入应用的测试账号列表
+  - 从测试链接中下载商店包进行支付的测试\
 \
 ![测试账号列表](/img/android/googleplay_shalf_2_2/0.png)
 
 - 当通过 `sku` 查询商品信息，返回错误码 `-1`，错误信息 `Service connection is disconnected` 时，可检查当前登录的测试账号，尽量不要是开发者账号；同时也可以进入 Google Play，检查是否有显示付费项目，如果有付费项目一般就没有问题，没有的话需要更换网络地区或者账号。
 - 谷歌掉单的情况下，最好是客户端通知服务端发货，支付时一定要记得传透传参数，或者本地储存 应用 orderid 和谷歌 orderid 的映射，这样在后面补单的时候才能对应上应用的订单号（否则会造成丢单），发货成功后服务端再对谷歌订单进行消耗。
 
-- 支付验证出现 `401` 的情况：\
-  \
+#### 4.2 支付验证出现 `401` 的情况
+\
 ![验证出错](/img/android/googleplay_shalf_2_2/1.png)
-1. 检查权限是否都有。\
-   \
+- 检查权限是否都有。\
+\
 ![权限](/img/android/googleplay_shalf_2_2/2.png)
 
-2. 将新建的 *server_account* 的 *email* 加入到测试组，然后重新保存应用内的商品信息：\
+- 将新建的 *server_account* 的 *email* 加入到测试组，然后重新保存应用内的商品信息：\
 \
 ![加入到测试组](/img/android/googleplay_shalf_2_2/3.png)
 \
 ![重新保存商品](/img/android/googleplay_shalf_2_2/4.png)
+
+#### 4.3 服务端验证订单出现的问题
+
+- 通知发货后，服务端验证订单时返回：`Google Play Android Developer API has not been used in project xxxxxx before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/androidpublisher.googleapis.com/overview?project=xxxxx then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.`\
+\
+出现这种情况需要启用 `Google Play Android Developer API` 服务。
+
+
+
+- 通知发货后，服务端验证订单时返回：`The project id used to call the Google Play Developer API has not been linked in the Google Play Developer Console.`\
+\
+原因是没有在谷歌后台关联应用，API关联前购买了商品，关联后得添加新的商品ID刷新。
