@@ -10,22 +10,20 @@ tags:
     - Android
 ---
 
->上文说到了 **Google 登录服务**的接入工作，接下来进行 **Google Play 结算库**的接入工作。
+>上文说到了 **Google 登录服务**的接入工作，接下来进行 **Google Play 结算服务**的接入工作，本文主要针对应用内一次性物品的购买，不涉及订阅物品，如有需要请参阅官方文档 [Google Play 结算系统](https://developer.android.google.cn/google/play/billing)。
 
-## Google Play 结算库
-**Google Play 结算库** 主要是应用 / 游戏使用谷歌的支付系统，其销售的内容一般来说分为两种：
-- *一次性物品* （一次性的非定期付费购买的商品，例如 xx 游戏中购买50点券）
+## Google Play 结算服务
+Google Play 结算服务主要是应用 / 游戏使用谷歌的支付系统，其销售的内容一般来说分为两种：
+- *一次性物品* （一次性的非定期付费购买的商品，例如 xx 游戏中购买50点券，或者一把武器）
 - *订阅物品* （定期使用内容的商品，例如订阅一个月的 xx 大会员）
-
-本文针对应用内一次性物品的购买，不涉及订阅物品，如有需要请参阅官方文档 [Google Play 结算库](https://developer.android.google.cn/google/play/billing)。
 
 话不多说，接下来接入 Google Play Billing，开始~
 
 ### 一、接入前的准备
 
-在结构较为复杂的项目或者多个项目中使用时，可以新建一个 **Module**，然后新建工具类用来实现所有的支付逻辑，包括谷歌支付的初始化，拉起支付，下单，补单等，最后通过提供接口供外部调用。
+在结构较为复杂的项目或者多个项目中使用时，可以新建一个 **Library**，然后新建工具类用来实现所有的支付逻辑，包括谷歌支付的初始化，拉起支付，下单，补单等，最后通过提供接口供外部调用。
 
-结算库的版本，可在官网查看，本文编写时的版本为 `5.0.0`，对比 `4.1.0` ，新版本在接入代码上有改动，所以新接入的话建议直接接 `5.0.0`。
+结算库的版本，可在官网查看，本文编写时的版本为 `5.0.0`，对比 ~~`4.1.0`~~ ，新版本在接入代码上有改动，所以新接入的话建议直接接 `5.0.0`。
 
 ### 二、接入 Google Play 结算服务 SDK
 
@@ -56,6 +54,7 @@ mBillingClient.startConnection(new BillingClientStateListener() {
     public void onBillingSetupFinished(BillingResult billingResult) {
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
             // 连接成功
+            // 这里也可以进行补单
         }
     }
 
@@ -67,13 +66,13 @@ mBillingClient.startConnection(new BillingClientStateListener() {
 });
 ```
 #### 2.3 查询商品信息
-通过 `sku` 查询商品信息，`sku` 是在 **Google Play后台** 配置的**商品标识**。
+`5.0.0` 可以通过 `queryProductDetailsAsync()` 方法传递 `QueryProductDetailsParams` 来查询商品信息。 `QueryProductDetailsParams` 只能传 `Product`（需要传入Google Play 后台配置的 `产品id`，也就是 `sku`）的列表，所以就算只购买一件物品，也要传 List。\
 \
 生成谷歌的交易参数，~~`4.0.0` 使用的是 `SkuDetailsParams`~~，`5.0.0` 改成了 `QueryProductDetailsParams`。\
-交易参数只能传 `sku` 的列表，所以单次购买一件商品，也要传 List。\
+交易参数只能传 `Product` 的列表，所以单次购买一件商品，也要传 List。\
 一次性购买的商品设置的 **type** 是 `SkuType.INAPP`，订阅物品则是 `SkuType.SUBS`。\
 \
-`SkuDetails` 是商品信息，一般情况我们原封不动拿到然后去下单即可。
+在 `onProductDetailsResponse()` 回调中返回的 `ProductDetails` 是商品信息，一般情况我们拿到原封不动然后去进行下单即可。
 
 ```java
 // 结算库 4.0
@@ -125,14 +124,13 @@ mBillingClient.queryProductDetailsAsync(queryProductDetailsParamsnew ProductDeta
 );
 ```
 #### 2.4 拉起支付页面
-通过 `launchBillingFlow()` 方法可以发起交易请求进行下单。\
-\
-先要新建一个下单请求的参数 `BillingFlowParams`，携带商品信息和额外信息;`ProductDetailsParams` 需要传入查询到的商品信息 `productDetails`。
+首先要新建一个下单请求的参数 `BillingFlowParams`，携带商品信息和额外信息;`ProductDetailsParams` 需要传入查询到的商品信息 `productDetails`。
 
+通过 `launchBillingFlow()` 方法可以发起交易请求进行下单，此时会拉起Google Play 的支付页面。
 - ~~`2.0` 版本~~ 和以前接入的 `AIDL` 方式，是提供了透传参数 `developerPayload` 的，方便开发者补单。
 - 现在的 `3.0` 版本往后是没有这个参数，取而代之的是在下单请求参数里面的关联字符串。
 
-建议 `setObfuscatedAccountId()` 传入应用的用户 `id`，`setObfuscatedProfileId` 传入应用本次下单的 `orderId`（不是谷歌的 `orderId`，是应用自己的 `orderId`），这样就可以关联到对应的应用 `orderId` 进行补单。
+建议 `setObfuscatedAccountId()` 传入应用的用户 `id`，`setObfuscatedProfileId` 传入应用本次下单的 `orderId`（不是谷歌的 `orderId`，是应用自己的 `orderId`），这样在补单的时候就可以关联到对应的 `应用 orderId`。
 
 ```java
 List<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
@@ -147,14 +145,14 @@ BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(productDetailsParamsList)
                 .setObfuscatedAccountId(orderId)
                 .setObfuscatedProfileId(orderId)
-                    .build();
+                .build();
 
-        // 拉起支付页面
+// 拉起支付页面
 BillingResult billingResult = mBillingClient.launchBillingFlow(activity, billingFlowParams);
 
 int responseCode = billingResult.getResponseCode();
 if (responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-            // 商品已存在
+    // 商品已存在
     return;
 }
 if (responseCode != BillingClient.BillingResponseCode.OK) {
@@ -163,7 +161,7 @@ if (responseCode != BillingClient.BillingResponseCode.OK) {
     return;
 }
 ```
-#### 2.5 支付结果
+#### 2.5 支付结果回调
 自定义成功和失败的接口，用来供外部调用，当然有其他的回调也可以加进来，像支付的步骤回调（用于支付日志打点上报）等。
 
 ```java
@@ -256,14 +254,14 @@ public void handleConsumePurchase(Purchase purchase) {
 ```
 
 #### 2.6 客户端补单
-- 在整个支付过程中，出现以下几种情况需要重新查询没有消耗的订单，然后进行补单：\
+- 在整个支付过程中会出现以下几种情况，需要重新查询没有消耗的订单，这时需要查单然后补单：\
 \
 A: 支付成功但是没有在 `onPurchasesUpdated()` 回调中收到支付成功。\
 B: 收到支付成功但是没有进行发货（一般是客户端通知服务端发货）。\
 C: 发货成功但是没有进行商品的消耗。\
-D: ~~在应用外进行的购买~~（本文是针对应用内支付，所以考虑该情况）。\
+D: ~~在应用外进行的购买~~（本文是针对应用内支付，所以可以不考虑该情况）。\
 \
-查询订单可通过 `BillingClient.queryPurchasesAsync()` 方法进行，一般在 `onCreate()` 和 `onResume()` 中调用，也可以在应用的初始化或者购买商品处调用。\
+可以通过 `BillingClient.queryPurchasesAsync()` 方法查询订单，一般在 `onCreate()` 和 `onResume()` 中调用，也可以在应用的初始化或者购买商品处调用。\
 \
 在查询消费失败的订单回调中，可以从 `purchase` 的附带信息中拿到下单时存的应用 `orderId` 和 `userId`，进行补单操作。
 
@@ -286,15 +284,15 @@ mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductT
 
 #### 3.1 获取验证配置
 
-- 在 Google Cloud Platform 中选择应用对应的项目
-- 搜索进入“API 和服务”
-- 点击“启用 API 和服务”
-- 选择并启用这些 API ：\
-  Google play android developer API\
-  Google Play Developer Reporting API\
-  Google Play Custom APP Publishing API
-- 创建一个服务账号，并授予 Owner 角色
-- 下载对应的 JSON 文件
+- 在 Google Cloud Platform 中选择应用对应的项目。
+- 搜索进入“API 和服务”。
+- 点击“启用 API 和服务”。
+- 选择并启用这些 API ：
+  1. Google play android developer API
+  2. Google Play Developer Reporting API
+  3. Google Play Custom APP Publishing API
+- 创建一个服务账号，并授予 Owner 角色。
+- 下载对应的 JSON 文件。
 
 #### 3.2 获取验证的 Token
 - 然后由服务端同事获取用于支付验证的 refresh_token。
@@ -302,19 +300,20 @@ mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductT
 ### 3.3 进行支付验证
 可以通过 [API products](https://developers.google.cn/android-publisher/api-ref/rest/v3/purchases.products) 拿到订单信息，根据购买状态和消耗状态和透传参数中的应用 `orderId` 判断是否发货。
 
-- `purchaseState` （购买状态）：0. 已购买 1. 已取消 2. 待处理
-- `consumptionState` （消耗状态）：0. 尚未消耗 1. 已使用
+- `purchaseState` （购买状态）：0. 已购买，1. 已取消，2. 待处理
+- `consumptionState` （消耗状态）：0. 尚未消耗，1. 已使用
 - `obfuscatedExternalProfileId` （可传字符串）：应用的 orderId 或者订单的唯一标识
 
 ### 四、避坑指南
-- 当通过 `sku` 查询商品信息，返回错误码 `-1`，错误信息 `Service connection is disconnected` 时，可检查当前登录的测试账号，尽量不要是开发者账号；同时也可以进入 Google Play，检查是否有显示付费项目，如果有付费项目一般就没有问题，没有的话需要更换网络地区或者账号。
-- 谷歌掉单的情况下，最好是客户端通知服务端发货，支付时一定要记得传透传参数，或者本地储存 应用 orderid 和谷歌 orderid 的映射，这样在后面补单的时候才能对应上应用的订单号（否则会造成丢单），发货成功后服务端再对谷歌订单进行消耗。
 - 谷歌结算服务的测试步骤：
   1. 上传 `aab` 包体到 Google Play
   2. 将本地账号加入应用的测试账号列表
   3. 从测试链接中下载商店包进行支付的测试\
 \
 ![测试账号列表](/img/android/googleplay_shalf_2_2/0.png)
+
+- 当通过 `sku` 查询商品信息，返回错误码 `-1`，错误信息 `Service connection is disconnected` 时，可检查当前登录的测试账号，尽量不要是开发者账号；同时也可以进入 Google Play，检查是否有显示付费项目，如果有付费项目一般就没有问题，没有的话需要更换网络地区或者账号。
+- 谷歌掉单的情况下，最好是客户端通知服务端发货，支付时一定要记得传透传参数，或者本地储存 应用 orderid 和谷歌 orderid 的映射，这样在后面补单的时候才能对应上应用的订单号（否则会造成丢单），发货成功后服务端再对谷歌订单进行消耗。
 
 - 支付验证出现 `401` 的情况：\
   \
