@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "『Android』 游戏 aab 包上传谷歌，提示超过 150 MB 的处理"
+title:      "『Android』 游戏 aab 包上传谷歌，提示超过限制大小的处理"
 subtitle:   "处理游戏 aab。"
 date:       2022-01-28 09:11:22
 author:     "purejiang"
@@ -10,7 +10,7 @@ tags:
     - Android
 ---
 
->游戏 aab 包上传谷歌，提示超过 150 MB 时需要进行应用的资源分发，所以在重打包前要做好 Play Asset Delivery（游戏资源分发）的处理  。
+>游戏 aab 包上传谷歌，提示超过 ~~150 MB~~ 200MB（20240407） 时需要进行应用的资源分发，所以在重打包前要做好 Play Asset Delivery（游戏资源分发）的处理  。
 
 #### 一、Play Asset Delivery
 关于 [Play Asset Delivery](https://developer.android.google.cn/guide/app-bundle/asset-delivery) 的详细介绍可以看官网文档，这里不再赘述。
@@ -66,14 +66,14 @@ dependencies {
 
 - 最后，通过对比配置资源分发后的 aab 和原来的 aab ，aab 的总体积无变化，不是说要小于150M 吗？
 
-别急，先解包可以发现，配置分发后的 aab 中多了资源包的文件夹，而且资源包占了绝大部分的体积 。本来体积很大的 base 现在只有不到100M，**只要 base 不大于150M 就可以顺利提交审核了**。
+别急，先解包可以发现，配置分发后的 aab 中多了资源包的文件夹，而且资源包占了绝大部分的体积 。本来体积很大的 base 现在只有不到100M，**只要 base 不大于~~150M~~ 200MB 就可以顺利提交审核了**。
 
 ![未做资源分发的 aab 结构](/img/android/aab_game_assets_pack/2.png)
 
 ![配置资源分发后的 aab 结构](/img/android/aab_game_assets_pack/3.png)
 
 #### 三、注意事项
-- 审核提示超过 150 MB，是指当用户下载应用时，安装应用所需的压缩 APK（例如，基本 APK + 配置 APK）的总大小不得超过 150 MB；配置了资源分发后，Asset Pack 也就是 **资源包** 的大小不计入其中。
+- 审核提示超过 ~~150M~~ 200MB，是指当用户下载应用时，安装应用所需的压缩 APK（例如，基本 APK + 配置 APK）的总大小不得超过 ~~150M~~ 200MB；配置了资源分发后，Asset Pack 也就是 **资源包** 的大小不计入其中。
 - Unity 游戏在 aab 安装后出现黑屏或者 **not enough storage space to install** 的提示，需要注意要将游戏启动相关的配置文件放在 app 目录下，而不是放在 **资源包** 中，例如 Unity 游戏的 `assets` 中的 `bin` 文件夹和 config 配置等。
 
 
